@@ -1041,6 +1041,9 @@ function animateCardPositions(instant = false) {
   cardMeshes.forEach((mesh, i) => {
     const p = positions[i];
     if (!p) return;
+    gsap.killTweensOf(mesh.position);
+    gsap.killTweensOf(mesh.rotation);
+    gsap.killTweensOf(mesh.scale);
     gsap.to(mesh.position, { x: p.x, y: p.y, z: p.z, duration: dur, ease: 'power2.inOut' });
     gsap.to(mesh.rotation, { x: p.rx, y: p.ry, duration: dur, ease: 'power2.inOut' });
     gsap.to(mesh.scale, { x: p.scale, y: p.scale, z: p.scale, duration: dur, ease: 'power2.inOut' });
@@ -1067,10 +1070,14 @@ function syncCards() {
     const p = positions[i];
 
     if (existing) {
-      // Reuse existing mesh — slide it to new position
+      // Reuse existing mesh — kill any in-flight tweens and slide to new position
       existingByKey.delete(key);
       existing.userData.roomIndex = i;
       newCardMeshes.push(existing);
+      gsap.killTweensOf(existing.position);
+      gsap.killTweensOf(existing.rotation);
+      gsap.killTweensOf(existing.scale);
+      gsap.killTweensOf(existing.material);
       gsap.to(existing.position, {
         x: p.x, y: p.y, z: p.z,
         duration: 0.5,
